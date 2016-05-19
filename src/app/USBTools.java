@@ -14,13 +14,13 @@ import javax.usb.UsbInterface;
 import javax.usb.UsbPort;
 import javax.usb.UsbServices;
 
-import app.USBDeviceLList;
+import app.UsbDeviceList;
 
 
 public class USBTools {
 	private UsbServices theServices;
 	private UsbHub theRootHub;
-	private USBDeviceLList theDeviceList;
+	private UsbDeviceList theDeviceList;
 	
 	public USBTools() {
 		initialization();
@@ -34,12 +34,17 @@ public class USBTools {
 			this.theRootHub = this.theServices.getRootUsbHub();
 			showServices();
 		} catch(UsbException e) {
-			System.out.println("Exception thrown  :" + e);	
+			System.out.println("Exception thrown  :" + e);
 		}
 		
-		// get the DeviceList
-		this.theDeviceList = new USBDeviceLList(this.theRootHub);
-		showAllDevices();
+		if(this.theRootHub.isRootUsbHub()) {
+			// get the DeviceList
+			System.out.println("Root Hub:\n" + this.theRootHub);
+			this.theDeviceList = new UsbDeviceList(this.theRootHub);
+			showAllDevices();
+		} else {
+			System.out.println("No Root Hub Found!");
+		}
 	}
 	
 	public void showServices() {
@@ -51,26 +56,33 @@ public class USBTools {
 	}
 
 	public void showAllDevices() {
+		// print all devices in theDeviceList
 		this.theDeviceList.showAll();
 	}
 	
 	public void showCurrentDevice() {
+		// print the current device in theDeviceList
 		this.theDeviceList.showCurrent();
 	}
 	
 	public void refreshDeviceList() {
+		// refresh theDeviceList
 		this.theDeviceList.refresh(this.theRootHub);
 	}
 	
 	public void selectDevice(final int index) {
+		// set the current device
 		this.theDeviceList.select(index);
 	}
 
 	public UsbDevice getCurrentDevice() {
+		// return the current device
 		return this.theDeviceList.getCurrent();
 	}
 	
-	
+	public ArrayList<UsbDevice> getDeviceList() {
+		return this.theDeviceList.getList();
+	}
 	
 	
 	

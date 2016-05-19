@@ -1,4 +1,3 @@
-
 package app;
 
 
@@ -9,30 +8,31 @@ import javax.usb.UsbDevice;
 import javax.usb.UsbHub;
 
 
-public class USBDeviceLList {
+public class UsbDeviceList {
 	private ArrayList<UsbDevice> theList;
-	private int current;
+	private int currentIndex;
 	
-	public USBDeviceLList() {
+	public UsbDeviceList() {
 		this.theList = new ArrayList<UsbDevice>();
-		this.current = -1;
+		this.currentIndex = -1;
 	}
 	
-	public USBDeviceLList(final UsbHub hub) {
+	public UsbDeviceList(final UsbHub rootHub) {
 		this.theList = new ArrayList<UsbDevice>();
-		this.current = -1;
-		refresh(hub);
+		this.currentIndex = -1;
+		refresh(rootHub);
 	}
 	
     public void clear() {
         // clear deviceList to empty
         this.theList.clear();
         this.theList.trimToSize();
-        this.current = -1;
+        this.currentIndex = -1;
         System.out.println("DeviceList cleared.");
     }
     
     private boolean checkIndex(final int index) {
+    	// check if the index is within the range of theList
     	if((index >= 0) && (index < this.theList.size())) {
     		return true;
     	} else {
@@ -41,16 +41,18 @@ public class USBDeviceLList {
     }
     
     public UsbDevice get(final int index) {
+    	// return the device at the index of theList
     	if(checkIndex(index)) {
     		return this.theList.get(index);
     	} else {
+    		System.out.println("None");
     		return null;
     	}
     }
 	
     public ArrayList<UsbDevice> getList() {
+    	// return theList
     	if(this.theList.isEmpty()) {
-    		System.out.println("DeviceList is Empty!");
     		return null;
     	} else {
     		return this.theList;
@@ -58,22 +60,25 @@ public class USBDeviceLList {
     }
 	
     public UsbDevice getCurrent() {
-    	if(checkIndex(this.current)) {
-    		return get(this.current);
+    	// return the device at the currentIndex of theList
+    	if(checkIndex(this.currentIndex)) {
+    		return get(this.currentIndex);
     	} else {
     		System.out.println("None");
     		return null;
     	}
     }
 	
-	public void refresh(final UsbHub hub) {
+	public void refresh(final UsbHub rootHub) {
+		// clear then load all devices to theList
         clear();
-        findAll(hub);
+        findAll(rootHub);
         this.theList.trimToSize();
         System.out.println("DeviceList Refreshed.");
 	}
 	
 	private void findAll(final UsbHub hub) {
+		// find and load all devices to theList
 		this.theList.add((UsbDevice) hub);
 		for(UsbDevice device: (List<UsbDevice>) hub.getAttachedUsbDevices()) {
 			if(device.isUsbHub()) {
@@ -85,17 +90,19 @@ public class USBDeviceLList {
 	}
 	
 	public void select(final int index) {
+		// set the currentIndex
 		if(checkIndex(index)) {
-			this.current = index;
+			this.currentIndex = index;
 		} else {
 			System.out.println("Invalid Index for DeviceList");
 		}
 	}
 
 	public void showCurrent() {
-		if(checkIndex(this.current)) {
-			System.out.println("Current Device:");
-			System.out.printf("%04d*", this.current);
+		// print info of the current device
+		if(checkIndex(this.currentIndex)) {
+			System.out.println("currentIndex Device:");
+			System.out.printf("%04d*", this.currentIndex);
 			System.out.println(getCurrent());
 		} else {
 			System.out.println("None");
@@ -103,10 +110,11 @@ public class USBDeviceLList {
 	}
 	
 	public void showAll() {
+		// print info of all the devices in theList
 		System.out.println("Device List");
 		if(this.theList.size() > 0) {
 			for(int i = 0; checkIndex(i); i++) {
-				if(i == this.current) {
+				if(i == this.currentIndex) {
 					System.out.printf("%04d*", i);
 				} else {
 					System.out.printf("%04d ", i);
@@ -119,8 +127,10 @@ public class USBDeviceLList {
 	}
 	
 	public boolean isEmpty() {
+		// check if theList is empty
 		this.theList.trimToSize();
 		if(this.theList.size() == 0) {
+			System.out.println("DeviceList is Empty!");
 			return true;
 		} else {
 			return false;
